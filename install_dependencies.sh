@@ -88,6 +88,8 @@ $PREFIX/bin/luarocks install image
 $PREFIX/bin/luarocks install env
 $PREFIX/bin/luarocks install qtlua
 $PREFIX/bin/luarocks install qttorch
+# ORON
+$PREFIX/bin/luarocks install luasocket
 
 echo ""
 echo "=> Torch7 has been installed successfully"
