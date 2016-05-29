@@ -131,7 +131,6 @@ while step < opt.steps do
             episode_reward = episode_reward + reward
             if reward ~= 0 then
                nrewards = nrewards + 1
-               print("asasffsa")
             end
 
             if terminal then

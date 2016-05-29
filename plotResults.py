@@ -11,7 +11,7 @@ import sys
 
 
 
-PATH = "results/res4/"
+PATH = "results/res1/"
 
 filename = "res"+str(sys.argv[1]);
 
@@ -156,6 +156,7 @@ if len(evalEpiNum)>1:
     plt.legend(loc='best')
 #    plt.savefig(PATH+filename+'_fig1.png')
     plt.savefig(pp, format='pdf')
+    plt.close()
 
 if len(q_a1)>1 and len(q_a2)>1 :
     # Q_a1
@@ -185,6 +186,7 @@ if len(q_a1)>1 and len(q_a2)>1 :
     plt.ylabel('eval_itr-make steps')
     #plt.savefig(PATH+filename+'TD.png')
     plt.savefig(pp, format='pdf')
+    plt.close()
     
     # Q_a12
     fig021 = plt.figure()
@@ -208,46 +210,24 @@ if len(q_a1)>1 and len(q_a2)>1 :
     plt.ylabel('eval_itr-make steps')
     #plt.savefig(PATH+filename+'TD.png')
     plt.savefig(pp, format='pdf')
+    plt.close()
     
     n_states = len(q_a1[1])
-    # Q_next_to terminal
-    plt.figure()
-    plt.title('Q('+str(n_states-2)+',*)')
-    q_right = []
-    q_left = []
-    for j in range(0,len(q_a1)):
-        q_right.append(q_a1[j][n_states-2])
-        q_left.append(q_a2[j][n_states-2])
-    plt.plot(q_right,color='b',label='Q(s,right)')
-    plt.plot(q_left,color='g',label='Q(s,left)')
-    plt.legend(loc='best')
-    plt.savefig(pp, format='pdf')
     
+    for s in range(0,n_states): 
+        plt.figure()
+        plt.title('Q('+str(s)+',*)')
+        q_right = []
+        q_left = []
+        for j in range(0,len(q_a1)):
+            q_right.append(q_a1[j][s])
+            q_left.append(q_a2[j][s])
+        plt.plot(q_right,color='b',label='Q('+str(s)+',right)')
+        plt.plot(q_left,color='g',label='Q('+str(s)+',left)')
+        plt.legend(loc='best')
+        plt.savefig(pp, format='pdf')
+        plt.close()
     
-    # Q_next_to terminal
-    plt.figure()
-    plt.title('Q('+str(n_states-3)+',*)')
-    q_right = []
-    q_left = []
-    for j in range(0,len(q_a1)):
-        q_right.append(q_a1[j][n_states-3])
-        q_left.append(q_a2[j][n_states-3])
-    plt.plot(q_right,color='b',label='Q(s,right)')
-    plt.plot(q_left,color='g',label='Q(s,left)')
-    plt.legend(loc='best')
-    plt.savefig(pp, format='pdf')
-    
-
-
-
-if (len(nerrors)>1):
-    # TD ERROR
-    fig2201 = plt.figure()
-    plt.title('avg no of errors')
-    plt.stem(nerrors)
-    plt.xlabel('eval itr')
-    #plt.savefig(PATH+filename+'TD.png')
-    plt.savefig(pp, format='pdf')
 
 
 # TD ERROR
@@ -257,6 +237,7 @@ plt.plot(TD)
 plt.xlabel('eval itr')
 #plt.savefig(PATH+filename+'TD.png')
 plt.savefig(pp, format='pdf')
+plt.close()
 
 # V
 fig02 = plt.figure()
@@ -265,6 +246,7 @@ plt.plot(V)
 plt.xlabel('eval itr')
 #plt.savefig(PATH+filename+'V.png')
 plt.savefig(pp, format='pdf')
+plt.close()
 
 if(layers_num>0):
     # weights norm/max
@@ -276,6 +258,7 @@ if(layers_num>0):
         plt.xlabel('eval itr')
         plt.legend(loc='best')
         plt.savefig(pp, format='pdf')
+        plt.close()
     
         
     # weights g norm/max
@@ -287,6 +270,7 @@ if(layers_num>0):
         plt.xlabel('eval itr')
         plt.legend(loc='best')
         plt.savefig(pp, format='pdf')
+        plt.close()
         
     
     

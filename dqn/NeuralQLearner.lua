@@ -303,7 +303,8 @@ end
 
 function nql:perceive(reward, rawstate, terminal, testing, testing_ep)
     -- Preprocess state (will be set to nil if terminal)
-    local state = self:preprocess(rawstate):float()
+    --local state = self:preprocess(rawstate):float()
+    local state = rawstate
     local curState
 
     if self.max_reward then
@@ -331,7 +332,7 @@ function nql:perceive(reward, rawstate, terminal, testing, testing_ep)
     end
 
     curState= self.transitions:get_recent()
-    curState = curState:resize(1, unpack(self.input_dims))
+    --curState = curState:resize(1, unpack(self.input_dims))
 
     -- Select action
     local actionIndex = 1
@@ -377,7 +378,7 @@ end
 
 
 function nql:q_val_report()
-   local MAXSTATE = 15
+   local MAXSTATE = self.state_dim
  
    local q1_t =""
    local q2_t =""    
@@ -385,14 +386,8 @@ function nql:q_val_report()
                   
    
    for itr=1,MAXSTATE do
-     local screen = torch.FloatTensor(1,1,84,84):fill(0);
-     screen[1][1][itr*2+1]:fill(0.298)
-     screen[1][1][itr*2+2]:fill(0.298)
-
-     if screen:dim() == 2 then
-        assert(false, 'Input must be at least 3D')
-        screen = screen:resize(1, state:size(1), state:size(2))
-     end
+     local screen = torch.FloatTensor(1,MAXSTATE):fill(0)
+     screen[1][itr] = 1
      
      if self.gpu >= 0 then
         screen = screen:cuda()

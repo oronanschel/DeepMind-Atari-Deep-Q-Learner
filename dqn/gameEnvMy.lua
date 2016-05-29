@@ -8,30 +8,25 @@ function gameEnvMy.getActions()
 end
 
 local debug = false
-local MAXSTATE = 15
-local itr  = 0
+local MAXSTATE = 15 --self.state_dim
+local itr  = 1
 local stp  = 0
 
 function gameEnvMy:step(action,training,new)
 
-   local screen = torch.FloatTensor(1,3,84,84):fill(0);
+   local screen = torch.FloatTensor(1,MAXSTATE):fill(0)
    local reward = 0 
    local terminal = false
    local terminal_t
    
    if (new == true) then 
      stp = 0
-     itr = 0
+     itr = 1
      reward = 0
      terminal = false
       
            -- update state  
-     screen[1][1][itr*6+1]:fill(1)
-     screen[1][1][itr*6+2]:fill(1)
-     screen[1][1][itr*6+3]:fill(1)
-     screen[1][1][itr*6+4]:fill(1)
-     screen[1][1][itr*6+5]:fill(1)
-     screen[1][1][itr*6+6]:fill(1)  
+     screen[1][itr] = 1
    else
      -- preform action 
      stp = stp + 1
@@ -46,12 +41,13 @@ function gameEnvMy:step(action,training,new)
      elseif action == 1 then 
         itr = itr - 1
         --blcok
-        if itr < 0 then itr = 0 end
+        if itr < 1 then itr = 1 end
      end
      
-        -- update state  
-     screen[1][1][itr*2+1]:fill(1)
-     screen[1][1][itr*2+2]:fill(1)
+        -- update state 
+            
+     screen[1][itr] = 1
+
   
      
      -- calculate reward
@@ -100,7 +96,7 @@ end
 
 function gameEnvMy.getState()
   if debug then print("getState") end
-  return gameEnvMy:step(99,false,false)
+  return gameEnvMy:step(99,false,true)
 end
 
 
