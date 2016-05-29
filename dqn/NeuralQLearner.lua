@@ -203,7 +203,11 @@ function nql:getQUpdate(args)
     -- Compute max_a Q(s_2, a).
     q2_max = target_q_net:forward(s2):float():max(2)
 
+    
+
+
     -- Compute q2 = (1-terminal) * gamma * max_a Q(s2, a)
+    --q2 = q2_max:clone():mul(self.discount):cmul(term)
     q2 = q2_max:clone():mul(self.discount):cmul(term)
 
     delta = r:clone():float()
@@ -364,6 +368,45 @@ function nql:perceive(reward, rawstate, terminal, testing, testing_ep)
     end
 end
 
+function nql:epsilon_report()
+   local ep = testing_ep or (self.ep_end +
+                math.max(0, (self.ep_start - self.ep_end) * (self.ep_endt -
+                math.max(0, self.numSteps - self.learn_start))/self.ep_endt))
+   print("Epsilon:"..ep)
+end
+
+
+function nql:q_val_report()
+   local MAXSTATE = 15
+ 
+   local q1_t =""
+   local q2_t =""    
+   local itr =0
+                  
+   
+   for itr=1,MAXSTATE do
+     local screen = torch.FloatTensor(1,1,84,84):fill(0);
+     screen[1][1][itr*2+1]:fill(0.298)
+     screen[1][1][itr*2+2]:fill(0.298)
+
+     if screen:dim() == 2 then
+        assert(false, 'Input must be at least 3D')
+        screen = screen:resize(1, state:size(1), state:size(2))
+     end
+     
+     if self.gpu >= 0 then
+        screen = screen:cuda()
+     end
+      
+     local q = self.network:forward(screen):float()
+     q1_t = q1_t ..tostring(q[1][1])..":"
+     q2_t = q2_t ..tostring(q[1][2])..":"
+   end
+   
+   print("Q_VALS:") 
+   print(q1_t)
+   print(q2_t) 
+end
 
 function nql:eGreedy(state, testing_ep)
     self.ep = testing_ep or (self.ep_end +
@@ -380,6 +423,7 @@ end
 
 function nql:greedy(state)
     -- Turn single state into minibatch.  Needed for convolutional nets.
+    
     if state:dim() == 2 then
         assert(false, 'Input must be at least 3D')
         state = state:resize(1, state:size(1), state:size(2))

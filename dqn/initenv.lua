@@ -15,7 +15,6 @@ require 'NeuralQLearner'
 require 'TransitionTable'
 require 'Rectifier'
 
-
 function torchSetup(_opt)
     _opt = _opt or {}
     local opt = table.copy(_opt)
@@ -111,12 +110,19 @@ function setup(_opt)
     --- first things first
     local opt = torchSetup(_opt)
 
+---[[
     -- load training framework and environment
     local framework = require(opt.framework)
     assert(framework)
 
     local gameEnv = framework.GameEnvironment(opt)
-    local gameActions = gameEnv:getActions()
+    --local gameActions = gameEnv:getActions()
+    
+--]]
+
+    -- load unity env (ORON)
+    local gameEnvMy = dofile('gameEnvMy.lua');
+    local gameActions = gameEnvMy:getActions()
 
     -- agent options
     _opt.agent_params.actions   = gameActions
@@ -139,7 +145,7 @@ function setup(_opt)
         end
     end
 
-    return gameEnv, gameActions, agent, opt
+    return gameEnvMy, gameActions, agent, opt
 end
 
 

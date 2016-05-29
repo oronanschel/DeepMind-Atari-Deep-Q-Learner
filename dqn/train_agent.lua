@@ -110,7 +110,7 @@ while step < opt.steps do
     if step % opt.eval_freq == 0 and step > learn_start then
 
         screen, reward, terminal = game_env:newGame()
-
+        print("new game")
         total_reward = 0
         nrewards = 0
         nepisodes = 0
@@ -122,7 +122,6 @@ while step < opt.steps do
 
             -- Play game in test mode (episodes don't end when losing a life)
             screen, reward, terminal = game_env:step(game_actions[action_index])
-
             -- display screen
             win = image.display({image=screen, win=win})
 
@@ -132,6 +131,7 @@ while step < opt.steps do
             episode_reward = episode_reward + reward
             if reward ~= 0 then
                nrewards = nrewards + 1
+               print("asasffsa")
             end
 
             if terminal then
@@ -141,6 +141,7 @@ while step < opt.steps do
                 screen, reward, terminal = game_env:nextRandomGame()
             end
         end
+        
 
         eval_time = sys.clock() - eval_time
         start_time = start_time + eval_time
@@ -169,6 +170,7 @@ while step < opt.steps do
 
         local training_rate = opt.actrep*opt.eval_freq/time_dif
 
+        --[[
         print(string.format(
             '\nSteps: %d (frames: %d), reward: %.2f, epsilon: %.2f, lr: %G, ' ..
             'training time: %ds, training rate: %dfps, testing time: %ds, ' ..
@@ -176,6 +178,22 @@ while step < opt.steps do
             step, step*opt.actrep, total_reward, agent.ep, agent.lr, time_dif,
             training_rate, eval_time, opt.actrep*opt.eval_steps/eval_time,
             nepisodes, nrewards))
+        --]]
+        
+        nepisodes = math.max(1, nepisodes)
+        print(string.format(
+            '\nSteps: %d (frames: %d), reward: %.2f, epsilon: %.2f, lr: %G, ' ..
+            'training time: %ds, training rate: %dfps, testing time: %ds, ' ..
+            'testing rate: %dfps,  num. ep.: %d,  num. rewards: %d',
+            step, step*opt.actrep, total_reward, agent.ep, agent.lr, time_dif,
+            training_rate, eval_time, opt.actrep*opt.eval_steps/eval_time,
+            nepisodes, nrewards))
+        
+        
+        
+            
+        agent:epsilon_report()
+        agent:q_val_report()
     end
 
     if step % opt.save_freq == 0 or step == opt.steps then
