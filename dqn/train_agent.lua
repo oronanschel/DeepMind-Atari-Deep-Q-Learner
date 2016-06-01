@@ -81,11 +81,11 @@ print("Iteration ..", step)
 local win = nil
 while step < opt.steps do
     step = step + 1
-    local action_index = agent:perceive(reward, screen, terminal)
+    local action = agent:perceive(reward, screen, terminal)
 
     -- game over? get next game!
     if not terminal then
-        screen, reward, terminal = game_env:step(game_actions[action_index], true)
+        screen, reward, terminal = game_env:step(action, true)
     else
         if opt.random_starts > 0 then
             screen, reward, terminal = game_env:nextRandomGame()
@@ -118,10 +118,10 @@ while step < opt.steps do
 
         local eval_time = sys.clock()
         for estep=1,opt.eval_steps do
-            local action_index = agent:perceive(reward, screen, terminal, true, 0.05)
+            local action = agent:perceive(reward, screen, terminal, true, 0.05)
 
             -- Play game in test mode (episodes don't end when losing a life)
-            screen, reward, terminal = game_env:step(game_actions[action_index])
+            screen, reward, terminal = game_env:step(action)
             -- display screen
             win = image.display({image=screen, win=win})
 

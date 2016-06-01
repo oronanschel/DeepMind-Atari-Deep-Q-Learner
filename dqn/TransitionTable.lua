@@ -51,8 +51,8 @@ function trans:__init(args)
         end
     end
 
-    self.s = torch.ByteTensor(self.maxSize, self.stateDim):fill(0)
-    self.a = torch.LongTensor(self.maxSize):fill(0)
+    self.s = torch.FloatTensor(self.maxSize, self.stateDim):fill(0)
+    self.a = torch.FloatTensor(self.maxSize):fill(0)
     self.r = torch.zeros(self.maxSize)
     self.t = torch.ByteTensor(self.maxSize):fill(0)
     self.action_encodings = torch.eye(self.numActions)
@@ -64,7 +64,7 @@ function trans:__init(args)
     self.recent_t = {}
 
     local s_size = self.stateDim*histLen
-    self.buf_a      = torch.LongTensor(self.bufferSize):fill(0)
+    self.buf_a      = torch.FloatTensor(self.bufferSize):fill(0)
     self.buf_r      = torch.zeros(self.bufferSize)
     self.buf_term   = torch.ByteTensor(self.bufferSize):fill(0)
     self.buf_s      = torch.FloatTensor(self.bufferSize, s_size):fill(0)
@@ -163,7 +163,7 @@ function trans:sample(batch_size)
         buf_s = self.gpu_s
         buf_s2 = self.gpu_s2
     end
-
+    
     return buf_s[range], buf_a[range], buf_r[range], buf_s2[range], buf_term[range]
 end
 
@@ -174,9 +174,10 @@ function trans:concatFrames(index, use_recent)
     else
         s, t = self.s, self.t
     end
-
+   
     local fullstate = s[1].new()
     fullstate:resize(self.histLen, unpack(s[1]:size():totable()))
+
 
     -- Zero out frames from all but the most recent episode.
     local zero_out = false
@@ -299,6 +300,7 @@ end
 
 
 function trans:add_recent_state(s, term)
+
     local s = s:clone()
     if #self.recent_s == 0 then
         for i=1,self.recentMemSize do
@@ -308,6 +310,8 @@ function trans:add_recent_state(s, term)
     end
 
     table.insert(self.recent_s, s)
+    
+         
     if term then
         table.insert(self.recent_t, 1)
     else
@@ -319,6 +323,7 @@ function trans:add_recent_state(s, term)
         table.remove(self.recent_s, 1)
         table.remove(self.recent_t, 1)
     end
+    
 end
 
 
@@ -377,7 +382,7 @@ function trans:read(file)
     self.insertIndex = 0
 
     self.s = torch.FloatTensor(self.maxSize, self.stateDim):fill(0)
-    self.a = torch.LongTensor(self.maxSize):fill(0)
+    self.a = torch.FloatTensor(self.maxSize):fill(0)
     self.r = torch.zeros(self.maxSize)
     self.t = torch.ByteTensor(self.maxSize):fill(0)
     self.action_encodings = torch.eye(self.numActions)
@@ -388,7 +393,7 @@ function trans:read(file)
     self.recent_a = {}
     self.recent_t = {}
 
-    self.buf_a      = torch.LongTensor(self.bufferSize):fill(0)
+    self.buf_a      = torch.FloatTensor(self.bufferSize):fill(0)
     self.buf_r      = torch.zeros(self.bufferSize)
     self.buf_term   = torch.ByteTensor(self.bufferSize):fill(0)
     self.buf_s      = torch.FloatTensor(self.bufferSize, self.stateDim * self.histLen):fill(0)

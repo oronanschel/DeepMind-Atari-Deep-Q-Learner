@@ -13,7 +13,7 @@ function create_network(args)
     net:add(args.nl())
     net:add(nn.Linear(hidnum, hidnum))
     net:add(args.nl())
-    net:add(nn.Linear(hidnum, args.n_actions))
+    net:add(nn.Linear(hidnum,3))
     --]]
     if args.gpu >=0 then
         net:cuda()

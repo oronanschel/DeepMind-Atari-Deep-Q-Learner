@@ -8,7 +8,7 @@ function gameEnvMy.getActions()
 end
 
 local debug = false
-local MAXSTATE = 15 --self.state_dim
+local MAXSTATE = 10--self.state_dim
 local itr  = 1
 local stp  = 0
 
@@ -24,56 +24,29 @@ function gameEnvMy:step(action,training,new)
      itr = 1
      reward = 0
      terminal = false
+
+     -- update state  
+     screen[1][itr] = 1
+   else
+     itr = itr + 1
       
-           -- update state  
-     screen[1][itr] = 1
-   else
-     -- preform action 
-     stp = stp + 1
-     
-     
-     --right
-     if action == 0 then
-        itr = itr + 1
-        --block
-        if(itr>MAXSTATE) then itr = MAXSTATE end
-     --left   
-     elseif action == 1 then 
-        itr = itr - 1
-        --blcok
-        if itr < 1 then itr = 1 end
-     end
-     
-        -- update state 
-            
-     screen[1][itr] = 1
-
-  
-     
+     local u_best = 3
+     local sigma = 2
+     local v = 1
+          
+   
      -- calculate reward
-     if itr == MAXSTATE then
-      reward = 1
-     else
-      reward = 0
-     end       
+     reward =  v -sigma*sigma*(u_best-action)*(u_best-action)
+     screen[1][itr] = 1
+     terminal = false
      
-     -- is terminal?
-     if (stp == MAXSTATE + 9) then 
+     if (itr==5) then
       terminal = true
-     else
-      terminal = false
-     end  
-
+     end 
    end
-   
-   if action==0 then
-      act_str = "right"
-   else
-      act_str = "left" 
-   end  
-   
-   --print("s:"..itr..", a:"..act_str..",r:"..reward..',t:'..tostring(terminal))
-   
+     
+     
+   -- print("s:"..screen[1][1]..",a:"..action..",r:"..reward) 
 
    return screen , reward, terminal
 end 

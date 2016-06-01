@@ -11,7 +11,7 @@ import sys
 
 
 
-PATH = "results/res1/"
+PATH = "results/res2/"
 
 filename = "res"+str(sys.argv[1]);
 
@@ -28,13 +28,9 @@ evalEpiNum = []
 step_time = []
 V = []
 TD = []
-q_a1= []    
-q_a2 = []
-q_a12 = []
-
-qt_a1= []    
-qt_a2 = []
-qt_a12 = []
+q_v= []    
+q_mu = []
+q_sig = []
 
 nerrors = []
 
@@ -118,13 +114,20 @@ for line in file:
         line = file.next()
         line_s = line.split(":")
         line_s = line_s[:-1]
-	a1 = [float(i) for i in line_s]
-	q_a1.append(a1)
+	v = [float(i) for i in line_s]
+	q_v.append(v)
+
 	line = file.next()
         line_s = line.split(":")
         line_s = line_s[:-1]
-	a2 = [float(i) for i in line_s]
-	q_a2.append(a2)
+	mu = [float(i) for i in line_s]
+	q_mu.append(mu)
+
+	line = file.next()
+        line_s = line.split(":")
+        line_s = line_s[:-1]
+	sig = [float(i) for i in line_s]
+	q_sig.append(sig)
                   
         
 print ('')
@@ -158,95 +161,52 @@ if len(evalEpiNum)>1:
     plt.savefig(pp, format='pdf')
     plt.close()
 
-if len(q_a1)>1 and len(q_a2)>1 :
-    # Q_a1
-    fig021 = plt.figure()
-    plt.subplot(1,2,2)
-    _vmin = min(min(min(q_a1)),min(min(q_a2)))
-    _vmax = max(max(max(q_a1)),max(max(q_a2)))
-    
-    plt.title('Q(right,s)')
-    plt.imshow(q_a1,vmin=_vmin, vmax=_vmax,cmap='Greys',interpolation='none')
-    plt.colorbar()
-    #print(q_a1)
-    
-    plt.xlabel('state')
-    plt.ylabel('eval_itr-make steps')
-    #plt.savefig(PATH+filename+'TD.png')
-    #plt.savefig(pp, format='pdf')
-    
-    # Q_a2
-    plt.subplot(1,2,1)
-    #fig021 = plt.figure()
-    plt.title('Q(left,s)')
-    plt.imshow(q_a2,vmin=_vmin, vmax=_vmax, cmap='Greys',interpolation='none')
-    plt.colorbar()
-    #print(q_a2)
-    plt.xlabel('state')
-    plt.ylabel('eval_itr-make steps')
+
+    # TD ERROR
+    fig01 = plt.figure()
+    plt.title('TD ERROR')
+    plt.plot(TD)
+    plt.xlabel('eval itr')
     #plt.savefig(PATH+filename+'TD.png')
     plt.savefig(pp, format='pdf')
     plt.close()
     
-    # Q_a12
-    fig021 = plt.figure()
-    plt.subplot(1,2,1)
-    plt.title('Q(right,s)-Q(left,s)')
-    #print(np.multiply(np.subtract(q_a2,q_a1),10000))
-    sub_q = np.subtract(q_a1,q_a2)
-    plt.imshow(np.sign(sub_q),vmin=-1, vmax=1, cmap='jet',interpolation='none')
-    plt.colorbar()
-    plt.xlabel('state')
-    plt.ylabel('eval_itr-make steps')
-    #plt.savefig(PATH+filename+'TD.png')
-    #plt.savefig(pp, format='pdf')
+if len(q_v)>1  :    
+    n_states = len(q_v[1])
+
     
-    plt.subplot(1,2,2)
-    plt.title('Q(right,s)-Q(left,s)')
-    #print(np.multiply(np.subtract(q_a2,q_a1),10000))
-    plt.imshow((np.subtract(q_a1,q_a2)) ,cmap='Greys',interpolation='none')
-    plt.colorbar()
-    plt.xlabel('state')
-    plt.ylabel('eval_itr-make steps')
-    #plt.savefig(PATH+filename+'TD.png')
+    # V
+    fig02 = plt.figure()
+    plt.title('V')
+    plt.plot(V)
+    plt.xlabel('eval itr')
+    #plt.savefig(PATH+filename+'V.png')
     plt.savefig(pp, format='pdf')
     plt.close()
     
-    n_states = len(q_a1[1])
     
     for s in range(0,n_states): 
         plt.figure()
-        plt.title('Q('+str(s)+',*)')
-        q_right = []
-        q_left = []
-        for j in range(0,len(q_a1)):
-            q_right.append(q_a1[j][s])
-            q_left.append(q_a2[j][s])
-        plt.plot(q_right,color='b',label='Q('+str(s)+',right)')
-        plt.plot(q_left,color='g',label='Q('+str(s)+',left)')
+        plt.title('V mu sigma state:'+str(s))
+        qq_v = []
+        qq_mu = []
+	qq_sig =[]
+        for j in range(0,len(q_v)):
+            qq_v.append(q_v[j][s])
+            qq_mu.append(q_mu[j][s])
+	    qq_sig.append(q_sig[j][s]*q_sig[j][s])
+        plt.plot(qq_v,color='b',label='V',linestyle="--")
+        plt.plot(qq_mu,color='g',label='mu',marker="^")
+        plt.plot(qq_sig,color='m',label='sigma^2',linestyle="-")
+        plt.grid(True)
+	
         plt.legend(loc='best')
         plt.savefig(pp, format='pdf')
         plt.close()
     
 
 
-# TD ERROR
-fig01 = plt.figure()
-plt.title('TD ERROR')
-plt.plot(TD)
-plt.xlabel('eval itr')
-#plt.savefig(PATH+filename+'TD.png')
-plt.savefig(pp, format='pdf')
-plt.close()
 
-# V
-fig02 = plt.figure()
-plt.title('V')
-plt.plot(V)
-plt.xlabel('eval itr')
-#plt.savefig(PATH+filename+'V.png')
-plt.savefig(pp, format='pdf')
-plt.close()
 
 if(layers_num>0):
     # weights norm/max
